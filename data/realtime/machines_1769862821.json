@@ -1,0 +1,23 @@
+[
+  {
+    "machine_id": "MILL-01",
+    "temperature": 82.44,
+    "vibration": 0.485,
+    "status": "IDLE",
+    "timestamp": "2026-01-31T12:33:41.278456"
+  },
+  {
+    "machine_id": "LATHE-02",
+    "temperature": 58.42,
+    "vibration": 1.416,
+    "status": "RUNNING",
+    "timestamp": "2026-01-31T12:33:41.278456"
+  },
+  {
+    "machine_id": "PRESS-03",
+    "temperature": 51.59,
+    "vibration": 0.286,
+    "status": "RUNNING",
+    "timestamp": "2026-01-31T12:33:41.278456"
+  }
+]
