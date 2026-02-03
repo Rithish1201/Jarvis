@@ -12,6 +12,7 @@ from app.api.maintenance import router as maintenance_router
 from app.api.iot import router as iot_router
 from app.api.gamification import router as gamification_router
 from app.api.handover import router as handover_router
+from app.api.commissioning import router as commissioning_router
 from app.database import init_db
 
 app = FastAPI(
@@ -49,6 +50,7 @@ app.include_router(maintenance_router)
 app.include_router(iot_router)
 app.include_router(gamification_router)
 app.include_router(handover_router)
+app.include_router(commissioning_router)
 
 
 @app.get("/", tags=["Health"])

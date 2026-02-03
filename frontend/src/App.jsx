@@ -11,6 +11,7 @@ import IoTPanel from "./IoTPanel";
 import CommandCenter from "./CommandCenter";
 import LeaderboardPanel from "./LeaderboardPanel";
 import HandoverPanel from "./HandoverPanel";
+import CommissioningPanel from "./CommissioningPanel";
 import "./index.css";
 
 const API_BASE = 'http://127.0.0.1:8000';
@@ -796,6 +797,7 @@ export default function App() {
   const [showCommandCenter, setShowCommandCenter] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showHandover, setShowHandover] = useState(false);
+  const [showCommissioning, setShowCommissioning] = useState(false);
   const [language, setLanguageState] = useState('en'); // 'en', 'ta', 'tanglish'
 
   // PWA hooks
@@ -967,6 +969,7 @@ export default function App() {
             <button onClick={() => { playSound(sounds.click); setShowMaintenance(true); }} style={{ background: 'transparent', border: '1px solid var(--hud-border)', color: '#ff9500', padding: '6px 12px', fontFamily: 'Orbitron', fontSize: '11px', cursor: 'pointer' }} title="Maintenance">🔧 MAINT</button>
             <button onClick={() => { playSound(sounds.click); setShowIoT(true); }} style={{ background: 'transparent', border: '1px solid var(--hud-border)', color: '#00ddff', padding: '6px 12px', fontFamily: 'Orbitron', fontSize: '11px', cursor: 'pointer' }} title="IoT Sensors">📡 IOT</button>
             <button onClick={() => { playSound(sounds.click); setShowCommandCenter(true); }} style={{ background: 'linear-gradient(135deg, rgba(0,240,255,0.2), rgba(168,85,247,0.2))', border: '1px solid #a855f7', color: '#a855f7', padding: '6px 12px', fontFamily: 'Orbitron', fontSize: '11px', cursor: 'pointer' }} title="Command Center">🎮 CMD CTR</button>
+            <button onClick={() => { playSound(sounds.click); setShowCommissioning(true); }} style={{ background: 'transparent', border: '1px solid var(--hud-border)', color: '#10b981', padding: '6px 12px', fontFamily: 'Orbitron', fontSize: '11px', cursor: 'pointer' }} title="New Machine Setup">🏭 NEW</button>
           </div>
 
           {/* Alerts Button */}
@@ -1199,6 +1202,13 @@ export default function App() {
           alerts={alerts}
           onExit={() => setShowCommandCenter(false)}
         />
+      )}
+
+      {/* New Machine Commissioning Advisor */}
+      {showCommissioning && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 100, overflow: 'auto' }}>
+          <CommissioningPanel onBack={() => setShowCommissioning(false)} />
+        </div>
       )}
     </div>
   );
