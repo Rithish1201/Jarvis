@@ -29,9 +29,9 @@ def get_readings_in_range(db: Session, start_time: datetime, end_time: datetime)
 def get_alerts_in_range(db: Session, start_time: datetime, end_time: datetime) -> List[Alert]:
     """Get all alerts within a time range"""
     return db.query(Alert).filter(
-        Alert.timestamp >= start_time,
-        Alert.timestamp <= end_time
-    ).order_by(Alert.timestamp.desc()).all()
+        Alert.created_at >= start_time,
+        Alert.created_at <= end_time
+    ).order_by(Alert.created_at.desc()).all()
 
 
 def calculate_uptime(readings: List[MachineReading], machine_id: str) -> Dict:
