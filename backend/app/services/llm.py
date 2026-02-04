@@ -1,10 +1,10 @@
 import requests
 import re
+from datetime import datetime
 
 OLLAMA_URL = "http://localhost:11434/api/generate"
 
 
-<<<<<<< HEAD
 def get_fallback_response(prompt: str) -> str:
     """
     Intelligent fallback responses when Ollama is not available.
@@ -17,79 +17,27 @@ def get_fallback_response(prompt: str) -> str:
         return "Hello! I'm Jarvis, your AI-powered Smart Factory Assistant. I help monitor machines, detect anomalies, predict maintenance needs, and keep your factory running smoothly. How can I assist you today?"
     
     # Status queries
-    if any(word in prompt_lower for word in ["status", "how are", "running", "overview"]):
+    if any(word in prompt_lower for word in ["status", "how are", "running", "overview", "health"]):
         return "All factory systems are currently being monitored. Check the dashboard for real-time machine status - green indicators show healthy machines, yellow shows warnings, and red indicates critical issues requiring attention."
     
     # Temperature queries
     if "temperature" in prompt_lower or "temp" in prompt_lower:
         return "I'm monitoring temperature sensors across all machines. You can see live temperature readings in the metrics panel at the bottom of the dashboard. If any machine exceeds safe thresholds, I'll alert you immediately."
     
-    # Health queries
-    if "health" in prompt_lower:
-        return "Machine health is calculated based on multiple factors: temperature, vibration levels, and operational patterns. The HEALTH metric on the dashboard shows the overall factory health percentage."
-    
     # Vibration queries
     if "vibration" in prompt_lower:
         return "Vibration monitoring helps detect mechanical issues before they cause failures. Unusual vibration patterns can indicate bearing wear, misalignment, or other mechanical problems."
     
     # Alert queries
-    if any(word in prompt_lower for word in ["alert", "warning", "critical", "problem", "issue"]):
+    if any(word in prompt_lower for word in ["alert", "warning", "critical", "problem", "issue", "wrong", "error"]):
         return "I continuously monitor for anomalies. Check the Alerts panel for current warnings. Critical alerts appear in red and require immediate attention. Warning alerts in yellow should be investigated soon."
     
     # Maintenance queries
-    if any(word in prompt_lower for word in ["maintenance", "repair", "fix", "predict"]):
+    if any(word in prompt_lower for word in ["maintenance", "repair", "fix", "predict", "forecast", "future"]):
         return "Based on historical patterns and current sensor data, I can predict when machines will need maintenance. Visit the MAINT panel to see maintenance schedules and recommendations for each machine."
     
     # Help queries
     if any(word in prompt_lower for word in ["help", "what can you do", "capabilities", "features"]):
-        return "I can help you with: 📊 Real-time machine monitoring, 🔔 Anomaly detection & alerts, 🔮 Predictive maintenance, 📈 Analytics & trends, 🎯 Machine control commands, and 📋 Report generation. Just ask me anything about your factory!"
-    
-    # Machine specific queries
-    machine_match = re.search(r'machine[_\s]?(\d+|[a-z]+)', prompt_lower)
-    if machine_match:
-        machine_id = machine_match.group(1)
-        return f"For detailed information about Machine {machine_id.upper()}, click on it in the MACHINES panel. I'll show you its current status, historical trends, and any predictions for upcoming maintenance needs."
-    
-    # Report queries
-    if "report" in prompt_lower:
-        return "I can generate various reports including daily summaries, maintenance logs, and performance analytics. Use the export feature in the top navigation to download reports in PDF or Excel format."
-    
-    # Simulation queries
-    if "simulat" in prompt_lower:
-        return "The SIMULATE panel lets you run digital twin simulations to test different scenarios and predict outcomes without affecting real machines. Great for planning and optimization!"
-    
-    # IoT queries
-    if "iot" in prompt_lower or "sensor" in prompt_lower:
-        return "The IOT panel shows all connected sensors and their real-time readings. You can configure alerts and thresholds for each sensor type."
-    
-    # Default response
-    return "I'm Jarvis, your factory AI assistant. I'm here to help monitor your machines and keep everything running smoothly. You can ask me about machine status, temperature readings, maintenance predictions, or any alerts. What would you like to know?"
-
-
-def ask_jarvis(prompt: str) -> str:
-    """
-    Query Jarvis AI using Ollama, with intelligent fallback if unavailable.
-    """
-=======
-def generate_fallback_response(prompt: str) -> str:
-    """Generate a smart fallback response when LLM is not available"""
-    prompt_lower = prompt.lower()
-    
-    # Extract machine data from prompt if present
-    machines_info = ""
-    if "machine" in prompt_lower or "mill" in prompt_lower or "lathe" in prompt_lower or "press" in prompt_lower:
-        machines_info = " Based on current sensor data, all monitored machines are operational."
-    
-    # Greeting responses
-    if any(word in prompt_lower for word in ["hello", "hi", "hey", "greet", "name"]):
-        return "👋 Hello! I'm Jarvis, your AI-powered Smart Factory Assistant. I can help you monitor machines, analyze anomalies, predict maintenance needs, and control factory operations. How can I assist you today?"
-    
-    # Status queries
-    if any(word in prompt_lower for word in ["status", "health", "how is", "how are"]):
-        return f"📊 Factory Status: All systems are being monitored in real-time.{machines_info} Check the dashboard for detailed health scores, temperature, vibration, and other metrics for each machine."
-    
-    # Help queries
-    if any(word in prompt_lower for word in ["help", "what can", "capabilities"]):
         return """🤖 I'm Jarvis, your Smart Factory AI. Here's what I can do:
 
 • **Monitor Machines** - Real-time health tracking for all equipment
@@ -100,15 +48,25 @@ def generate_fallback_response(prompt: str) -> str:
 • **Generate Reports** - Create shift summaries and analytics
 
 Try asking: "What's the status of MILL-01?" or "Show me any anomalies" """
-
-    # Anomaly queries
-    if any(word in prompt_lower for word in ["anomal", "problem", "issue", "wrong", "error"]):
-        return "🔍 Scanning for anomalies... I'm monitoring all machines for unusual patterns in temperature, vibration, and performance metrics. Check the Anomalies panel on the dashboard for real-time alerts, or ask about a specific machine."
-
-    # Prediction queries  
-    if any(word in prompt_lower for word in ["predict", "forecast", "future", "maintenance", "when will"]):
-        return "🔮 Predictive Analysis: I analyze historical patterns and current trends to forecast potential issues. Machine learning models track temperature trends, vibration patterns, and usage cycles to predict maintenance needs 24-72 hours in advance."
-
+    
+    # Machine specific queries
+    machine_match = re.search(r'machine[_\s]?(\d+|[a-z]+[_\-]?[0-9]*)', prompt_lower)
+    if machine_match:
+        machine_id = machine_match.group(1).upper()
+        return f"For detailed information about Machine {machine_id}, click on it in the MACHINES panel. I'll show you its current status, historical trends, and any predictions for upcoming maintenance needs."
+    
+    # Report queries
+    if "report" in prompt_lower:
+        return "I can generate various reports including daily summaries, maintenance logs, and performance analytics. Use the export feature in the top navigation to download reports in PDF or Excel format."
+    
+    # Simulation/Commissioning queries
+    if "simulat" in prompt_lower or "commission" in prompt_lower:
+        return "The NEW (Commissioning) panel allows you to analyze historical data to properly set up new machinery, while the SIMULATE panel lets you run digital twin scenarios. Both help in optimizing your factory operations!"
+    
+    # IoT queries
+    if "iot" in prompt_lower or "sensor" in prompt_lower:
+        return "The IOT panel shows all connected sensors and their real-time readings. You can configure alerts and thresholds for each sensor type."
+    
     # Default response
     return f"""I understand you're asking about: "{prompt[:100]}..."
 
@@ -119,17 +77,13 @@ Try asking: "What's the status of MILL-01?" or "Show me any anomalies" """
 2. Run: `ollama serve`
 3. Pull model: `ollama pull mistral`
 
-**Meanwhile, I can still help with:**
-• Real-time machine monitoring (check dashboard)
-• Anomaly detection and alerts
-• Basic status queries
-
-Ask me about machine status, anomalies, or say "help" for more options!"""
+Meanwhile, I can still help with real-time machine monitoring, anomaly detection, and basic status queries. What else can I help you with today?"""
 
 
 def ask_jarvis(prompt: str) -> str:
-    """Query the LLM with fallback support"""
->>>>>>> a9357b0024ad8a945e2a6b615e7c497dc15b839b
+    """
+    Query Jarvis AI using Ollama, with intelligent fallback if unavailable.
+    """
     try:
         response = requests.post(
             OLLAMA_URL,
@@ -138,16 +92,11 @@ def ask_jarvis(prompt: str) -> str:
                 "prompt": prompt,
                 "stream": False
             },
-<<<<<<< HEAD
-            timeout=30  # Reduced timeout for faster fallback
-=======
-            timeout=60
->>>>>>> a9357b0024ad8a945e2a6b615e7c497dc15b839b
+            timeout=30  # Wait up to 30s for the LLM
         )
         
         if response.status_code == 200:
             data = response.json()
-<<<<<<< HEAD
             return data.get("response", get_fallback_response(prompt))
         else:
             return get_fallback_response(prompt)
@@ -157,21 +106,8 @@ def ask_jarvis(prompt: str) -> str:
         return get_fallback_response(prompt)
     except requests.exceptions.Timeout:
         # Ollama too slow - use fallback
-        return get_fallback_response(prompt)
+        return f"⏱️ Request timed out. The AI is taking too long to respond. Falling back to basic assistance:\n\n{get_fallback_response(prompt)}"
     except Exception as e:
         # Any other error - use fallback
         print(f"[Jarvis] LLM error: {e}, using fallback")
         return get_fallback_response(prompt)
-=======
-            return data.get("response", generate_fallback_response(prompt))
-        else:
-            return generate_fallback_response(prompt)
-            
-    except requests.exceptions.ConnectionError:
-        # Ollama not running - use fallback
-        return generate_fallback_response(prompt)
-    except requests.exceptions.Timeout:
-        return "⏱️ Request timed out. The AI is taking too long to respond. Please try a simpler question or check if Ollama is running properly."
-    except Exception as e:
-        return generate_fallback_response(prompt)
->>>>>>> a9357b0024ad8a945e2a6b615e7c497dc15b839b
