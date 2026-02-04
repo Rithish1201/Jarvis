@@ -18,7 +18,7 @@ export default function AnalyticsDashboard({ language = 'en', onBack }) {
         setLoading(true);
         try {
             const [shift, comp, daily] = await Promise.all([
-                getShiftSummary(8, language),
+                getShiftSummary(24, language),  // 24 hours for better data coverage
                 getMachineComparison(),
                 getDailySummary(7)
             ]);
@@ -110,7 +110,7 @@ export default function AnalyticsDashboard({ language = 'en', onBack }) {
                 <div style={styles.chartCard}>
                     <h3 style={styles.chartTitle}>7-Day Health Trend</h3>
                     <ResponsiveContainer width="100%" height={250}>
-                        <LineChart data={dailyData?.reverse() || []}>
+                        <LineChart data={[...(dailyData || [])].reverse()}>
                             <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,240,255,0.2)" />
                             <XAxis dataKey="date" stroke="#00f0ff" />
                             <YAxis stroke="#00f0ff" />
