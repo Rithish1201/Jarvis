@@ -11,4 +11,8 @@ __pycache__/
 # OS
 .DS_Store
 
+<<<<<<< HEAD
 data/realtime/
+=======
+data/realtime/*.json
+>>>>>>> a9357b0024ad8a945e2a6b615e7c497dc15b839b
