@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Machine Commissioning Advisor – Implementation Report</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+        :root {
+            --primary: #1a56db;
+            --primary-light: #e8effd;
+            --text: #1f2937;
+            --text-secondary: #6b7280;
+            --border: #e5e7eb;
+            --bg-light: #f9fafb;
+            --success: #059669;
+            --warning: #d97706;
+            --danger: #dc2626;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text);
+            line-height: 1.7;
+            background: #fff;
+            font-size: 14px;
+        }
+
+        @media print {
+            body { font-size: 12px; }
+            .page-break { page-break-before: always; }
+            .no-print { display: none; }
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 50px;
+        }
+
+        /* Cover Page */
+        .cover {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 60px;
+        }
+
+        .cover .logo {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .cover h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--primary);
+            line-height: 1.3;
+            margin-bottom: 8px;
+        }
+
+        .cover .subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            font-weight: 400;
+            margin-bottom: 40px;
+        }
+
+        .cover .project-name {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .cover .project-desc {
+            font-size: 15px;
+            color: var(--text-secondary);
+            max-width: 500px;
+            margin-bottom: 50px;
+        }
+
+        .cover-meta {
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 2;
+        }
+
+        .cover-meta strong {
+            color: var(--text);
+        }
+
+        /* Headings */
+        h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 40px 0 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--primary-light);
+        }
+
+        h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 28px 0 12px;
+        }
+
+        h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin: 20px 0 8px;
+        }
+
+        p { margin-bottom: 12px; }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0 24px;
+            font-size: 13px;
+        }
+
+        th {
+            background: var(--primary);
+            color: #fff;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:nth-child(even) td {
+            background: var(--bg-light);
+        }
+
+        /* Code */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            background: var(--bg-light);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        pre {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 16px 0 24px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        pre code {
+            background: none;
+            border: none;
+            padding: 0;
+            color: inherit;
+        }
+
+        /* Info boxes */
+        .info-box {
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 16px 0 24px;
+            border-left: 4px solid;
+        }
+
+        .info-box.blue {
+            background: #eff6ff;
+            border-color: var(--primary);
+        }
+
+        .info-box.green {
+            background: #f0fdf4;
+            border-color: var(--success);
+        }
+
+        .info-box.yellow {
+            background: #fffbeb;
+            border-color: var(--warning);
+        }
+
+        /* Lists */
+        ul, ol {
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        /* Flow diagram boxes */
+        .flow-diagram {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 20px 0 28px;
+            padding: 20px;
+            background: var(--bg-light);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .flow-box {
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-align: center;
+            min-width: 130px;
+        }
+
+        .flow-arrow {
+            font-size: 20px;
+            color: var(--text-secondary);
+        }
+
+        .flow-blue { background: #dbeafe; color: #1e40af; }
+        .flow-green { background: #dcfce7; color: #166534; }
+        .flow-purple { background: #ede9fe; color: #5b21b6; }
+        .flow-orange { background: #ffedd5; color: #9a3412; }
+
+        /* Section numbering */
+        .section-number {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            border-radius: 50%;
+            font-size: 13px;
+            font-weight: 700;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        /* Print button */
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(26, 86, 219, 0.3);
+            z-index: 1000;
+        }
+
+        .print-btn:hover {
+            background: #1e40af;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-green { background: #dcfce7; color: #166534; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-orange { background: #ffedd5; color: #9a3412; }
+        .badge-red { background: #fee2e2; color: #991b1b; }
+
+        .toc a {
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            color: var(--primary);
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 30px 0;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+            background: var(--bg-light);
+        }
+
+        .card h4 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+
+<button class="print-btn no-print" onclick="window.print()">📄 Save as PDF</button>
+
+<!-- =================== COVER PAGE =================== -->
+<div class="container">
+    <div class="cover">
+        <div class="logo">🏭</div>
+        <h1>New Machine Commissioning Advisor</h1>
+        <div class="subtitle">Implementation Report</div>
+
+        <div class="project-name">JARVIS — Smart Factory Monitoring System</div>
+        <div class="project-desc">
+            AI-Powered Industrial IoT Platform for Smart Manufacturing with Real-Time Monitoring, Predictive Analytics, and Intelligent Advisory Systems
+        </div>
+
+        <div class="cover-meta">
+            <div><strong>Author:</strong> Rithish</div>
+            <div><strong>Date:</strong> February 16, 2026</div>
+            <div><strong>Version:</strong> 2.0.0</div>
+            <div><strong>Technology Stack:</strong> FastAPI · React 19 · SQLAlchemy · Vite</div>
+        </div>
+    </div>
+
+    <!-- =================== TABLE OF CONTENTS =================== -->
+    <div class="page-break"></div>
+
+    <h2>Table of Contents</h2>
+    <ol class="toc" style="font-size: 15px; line-height: 2.2;">
+        <li><a href="#abstract">Abstract</a></li>
+        <li><a href="#introduction">Introduction</a></li>
+        <li><a href="#objectives">Objectives</a></li>
+        <li><a href="#architecture">System Architecture</a></li>
+        <li><a href="#backend">Backend Implementation</a>
+            <ol style="margin-top: 4px;">
+                <li><a href="#data-models">Data Models</a></li>
+                <li><a href="#api-endpoints">API Endpoints</a></li>
+                <li><a href="#service-layer">Service Layer & Core Algorithms</a></li>
+            </ol>
+        </li>
+        <li><a href="#frontend">Frontend Implementation</a></li>
+        <li><a href="#data-flow">Data Flow & Sequence</a></li>
+        <li><a href="#testing">Testing & Results</a></li>
+        <li><a href="#design-decisions">Key Design Decisions</a></li>
+        <li><a href="#screenshots">User Interface</a></li>
+        <li><a href="#conclusion">Conclusion & Future Scope</a></li>
+    </ol>
+
+    <!-- =================== 1. ABSTRACT =================== -->
+    <div class="page-break"></div>
+
+    <h2 id="abstract"><span class="section-number">1</span>Abstract</h2>
+    <p>
+        This report presents the implementation of the <strong>New Machine Commissioning Advisor</strong>, a feature module within the JARVIS Smart Factory Monitoring System. The advisor leverages historical factory sensor data and alert records to generate intelligent, data-driven recommendations when commissioning new machines on the factory floor.
+    </p>
+    <p>
+        The system employs statistical analysis on historical sensor readings (temperature, vibration, RPM) and alert pattern recognition to produce actionable outputs: safe operating limits, operational risk assessments, configuration recommendations, and preventive maintenance guidelines. The implementation follows a full-stack architecture with a FastAPI backend, SQLAlchemy ORM, and a React 19 frontend with a futuristic HUD-style user interface.
+    </p>
+
+    <!-- =================== 2. INTRODUCTION =================== -->
+    <h2 id="introduction"><span class="section-number">2</span>Introduction</h2>
+    <p>
+        Smart manufacturing environments generate vast amounts of sensor data over time. When a new machine is introduced to the factory floor, operators typically rely on manufacturer-provided default configurations and generic guidelines. This approach ignores the wealth of knowledge embedded in the factory's own operational history — knowledge about recurring failure patterns, environmental conditions, and optimal operating ranges that are unique to each facility.
+    </p>
+    <p>
+        The <strong>New Machine Commissioning Advisor</strong> bridges this gap by analyzing historical data from the factory's existing machines to:
+    </p>
+    <ul>
+        <li>Identify recurring failure patterns and their root causes</li>
+        <li>Calculate statistically-derived safe operating thresholds</li>
+        <li>Assess risks specific to the new machine's specifications</li>
+        <li>Recommend optimal monitoring configurations</li>
+        <li>Generate preventive maintenance guidelines</li>
+    </ul>
+
+    <div class="info-box blue">
+        <strong>Key Innovation:</strong> Unlike static commissioning checklists, this system provides <em>dynamic, factory-specific</em> recommendations that evolve as more operational data is accumulated.
+    </div>
+
+    <!-- =================== 3. OBJECTIVES =================== -->
+    <h2 id="objectives"><span class="section-number">3</span>Objectives</h2>
+    <ol>
+        <li><strong>Historical Pattern Mining:</strong> Analyze past alerts to identify common failure types, severities, and frequencies across all machines in the factory.</li>
+        <li><strong>Statistical Limit Calculation:</strong> Compute optimal, warning, and critical thresholds for temperature, vibration, and RPM based on real sensor data from healthy machines.</li>
+        <li><strong>Risk-Aware Commissioning:</strong> Cross-reference incoming machine specifications (power, RPM, environment) with historical incident data to flag potential risks.</li>
+        <li><strong>Actionable Recommendations:</strong> Generate specific configuration parameters and preventive guidelines tailored to the new machine's profile and the factory's history.</li>
+        <li><strong>Intuitive User Interface:</strong> Present analysis results in a clear, visually organized dashboard that operators can use without technical expertise.</li>
+    </ol>
+
+    <!-- =================== 4. ARCHITECTURE =================== -->
+    <div class="page-break"></div>
+
+    <h2 id="architecture"><span class="section-number">4</span>System Architecture</h2>
+
+    <h3>4.1 High-Level Architecture</h3>
+
+    <div class="flow-diagram">
+        <div class="flow-box flow-blue">🖥️ React Frontend<br><small>CommissioningPanel.jsx</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box flow-green">🔌 FastAPI Router<br><small>api/commissioning.py</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box flow-purple">⚙️ Service Layer<br><small>services/commissioning.py</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box flow-orange">🗃️ SQLite Database<br><small>MachineReading + Alert</small></div>
+    </div>
+
+    <h3>4.2 Component Inventory</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Layer</th>
+                <th>File</th>
+                <th>Lines</th>
+                <th>Purpose</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Frontend</td>
+                <td><code>CommissioningPanel.jsx</code></td>
+                <td>339</td>
+                <td>Input form + results display panel</td>
+            </tr>
+            <tr>
+                <td>API Router</td>
+                <td><code>api/commissioning.py</code></td>
+                <td>143</td>
+                <td>REST endpoint definitions (3 routes)</td>
+            </tr>
+            <tr>
+                <td>Service</td>
+                <td><code>services/commissioning.py</code></td>
+                <td>272</td>
+                <td>Core analysis algorithms</td>
+            </tr>
+            <tr>
+                <td>Models</td>
+                <td><code>models/machine_data.py</code></td>
+                <td>31</td>
+                <td>ORM class definitions</td>
+            </tr>
+            <tr>
+                <td>App Entry</td>
+                <td><code>main.py</code></td>
+                <td>64</td>
+                <td>Router registration</td>
+            </tr>
+            <tr>
+                <td>App Shell</td>
+                <td><code>App.jsx</code></td>
+                <td>1225</td>
+                <td>Navigation + panel integration</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>4.3 Technology Stack</h3>
+    <div class="grid-2">
+        <div class="card">
+            <h4>Backend</h4>
+            <ul>
+                <li><strong>FastAPI</strong> — Async REST API framework</li>
+                <li><strong>SQLAlchemy</strong> — Database ORM</li>
+                <li><strong>Pydantic</strong> — Request/response validation</li>
+                <li><strong>SQLite</strong> — Embedded database</li>
+                <li><strong>Python 3.10+</strong> — Standard library statistics</li>
+            </ul>
+        </div>
+        <div class="card">
+            <h4>Frontend</h4>
+            <ul>
+                <li><strong>React 19</strong> — UI framework</li>
+                <li><strong>Vite</strong> — Build tool</li>
+                <li><strong>TailwindCSS</strong> — Utility-first styling</li>
+                <li><strong>Lucide React</strong> — Icon library</li>
+                <li><strong>Fetch API</strong> — HTTP client</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- =================== 5. BACKEND =================== -->
+    <div class="page-break"></div>
+
+    <h2 id="backend"><span class="section-number">5</span>Backend Implementation</h2>
+
+    <h3 id="data-models">5.1 Data Models</h3>
+    <p>The system relies on two SQLAlchemy ORM models that store historical factory data:</p>
+
+    <h4>MachineReading</h4>
+    <p>Stores sensor readings from all machines. Each record captures a snapshot of a machine's state at a point in time.</p>
+    <pre><code>class MachineReading(Base):
+    __tablename__ = "machine_readings"
+    id = Column(Integer, primary_key=True, index=True)
+    machine_id = Column(String, index=True, nullable=False)
+    temperature = Column(Float, default=0)       # °C
+    vibration = Column(Float, default=0)          # mm/s
+    rpm = Column(Float, default=0)                # Revolutions per minute
+    health_score = Column(Integer, default=100)   # 0-100%
+    status = Column(String, default="Healthy")    # Healthy | Warning | Critical
+    timestamp = Column(DateTime, default=datetime.utcnow, index=True)</code></pre>
+
+    <h4>Alert</h4>
+    <p>Records system-generated alerts when sensor values exceed thresholds.</p>
+    <pre><code>class Alert(Base):
+    __tablename__ = "alerts"
+    id = Column(Integer, primary_key=True, index=True)
+    machine_id = Column(String, index=True, nullable=False)
+    alert_type = Column(String, nullable=False)    # temperature | vibration | rpm | health
+    severity = Column(String, nullable=False)      # warning | critical
+    message = Column(String, nullable=False)
+    acknowledged = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)</code></pre>
+
+    <h3 id="api-endpoints">5.2 API Endpoints</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Description</th>
+                <th>Input</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="badge badge-green">POST</span></td>
+                <td><code>/commissioning/analyze</code></td>
+                <td>Full analysis with recommendations</td>
+                <td>NewMachineSpecs (JSON body)</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-blue">GET</span></td>
+                <td><code>/commissioning/patterns</code></td>
+                <td>Historical failure patterns</td>
+                <td><code>?days=30</code> (query param)</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-blue">GET</span></td>
+                <td><code>/commissioning/limits</code></td>
+                <td>Safe operating limits</td>
+                <td><code>?days=30</code> (query param)</td>
+            </tr>
+            <tr>
+                <td><span class="badge badge-green">POST</span></td>
+                <td><code>/commissioning/risks</code></td>
+                <td>Risk assessment only</td>
+                <td>NewMachineSpecs (JSON body)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h4>Request Schema — NewMachineSpecs</h4>
+    <table>
+        <thead>
+            <tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>machine_type</code></td><td>string</td><td>"General"</td><td>Type/name of the new machine</td></tr>
+            <tr><td><code>rated_power</code></td><td>float</td><td>10.0</td><td>Power rating in kW</td></tr>
+            <tr><td><code>rated_rpm</code></td><td>float</td><td>2000.0</td><td>Maximum RPM rating</td></tr>
+            <tr><td><code>rated_temperature</code></td><td>float</td><td>60.0</td><td>Max operating temperature (°C)</td></tr>
+            <tr><td><code>environment</code></td><td>string</td><td>"normal"</td><td>One of: normal, high_humidity, dusty, hot, cold</td></tr>
+        </tbody>
+    </table>
+
+    <h4>Response Schema — CommissioningResponse</h4>
+    <table>
+        <thead>
+            <tr><th>Field</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td><code>success</code></td><td>boolean</td><td>Whether analysis completed successfully</td></tr>
+            <tr><td><code>machine_type</code></td><td>string</td><td>Echo of input machine type</td></tr>
+            <tr><td><code>failure_patterns</code></td><td>array</td><td>Top 10 recurring alert patterns</td></tr>
+            <tr><td><code>safe_operating_limits</code></td><td>object</td><td>Thresholds for temp, vibration, RPM</td></tr>
+            <tr><td><code>operational_risks</code></td><td>array</td><td>Machine-specific risk assessments</td></tr>
+            <tr><td><code>configuration_recommendations</code></td><td>array</td><td>Suggested monitoring parameters</td></tr>
+            <tr><td><code>preventive_guidelines</code></td><td>array</td><td>Setup and maintenance guidelines</td></tr>
+            <tr><td><code>summary</code></td><td>object</td><td>Aggregate counts and data confidence</td></tr>
+        </tbody>
+    </table>
+
+    <!-- Service Layer -->
+    <div class="page-break"></div>
+
+    <h3 id="service-layer">5.3 Service Layer — Core Algorithms</h3>
+    <p>The service layer in <code>services/commissioning.py</code> contains four core functions that form the analysis pipeline:</p>
+
+    <h4>Function 1: <code>identify_failure_patterns(db, days=30)</code></h4>
+    <div class="info-box blue">
+        <strong>Purpose:</strong> Mine historical alerts to find the most common failure types and their characteristics.
+    </div>
+    <p><strong>Algorithm:</strong></p>
+    <ol>
+        <li>Query all <code>Alert</code> records from the past N days</li>
+        <li>Group alerts by composite key <code>(alert_type, severity)</code></li>
+        <li>For each group: count occurrences, track unique machines affected, collect sample alert messages</li>
+        <li>Classify frequency: <span class="badge badge-red">High (&gt;10)</span> <span class="badge badge-orange">Medium (&gt;5)</span> <span class="badge badge-green">Low (≤5)</span></li>
+        <li>Enrich each pattern with probable root cause and prevention tip from a knowledge base</li>
+        <li>Sort by occurrence count (descending) and return top 10</li>
+    </ol>
+
+    <h4>Function 2: <code>calculate_safe_limits(db, days=30)</code></h4>
+    <div class="info-box green">
+        <strong>Purpose:</strong> Derive statistically-grounded operating thresholds from healthy machine data.
+    </div>
+    <p><strong>Algorithm:</strong></p>
+    <ol>
+        <li>Query all <code>MachineReading</code> records where <code>health_score &gt; 60</code> (healthy machines only)</li>
+        <li>Extract temperature, vibration, and RPM value arrays</li>
+        <li>For each parameter, compute: <strong>μ</strong> (mean) and <strong>σ</strong> (standard deviation)</li>
+        <li>Derive thresholds:
+            <ul>
+                <li><strong>Minimum</strong> = max(0, μ − 2σ)</li>
+                <li><strong>Optimal</strong> = μ</li>
+                <li><strong>Warning</strong> = μ + σ</li>
+                <li><strong>Critical</strong> = μ + kσ (where k varies: 2.0 for temp, 2.5 for vibration, 1.5 for RPM)</li>
+            </ul>
+        </li>
+        <li>Report confidence level based on data volume:
+            <span class="badge badge-green">High (&gt;1000 readings)</span>
+            <span class="badge badge-orange">Medium (&gt;100)</span>
+            <span class="badge badge-red">Low (≤100)</span>
+        </li>
+        <li>Fall back to sensible industry defaults if fewer than 10 readings available</li>
+    </ol>
+
+    <h4>Function 3: <code>analyze_operational_risks(db, machine_specs)</code></h4>
+    <div class="info-box yellow">
+        <strong>Purpose:</strong> Cross-reference the new machine's specs with historical incident data to identify potential problems.
+    </div>
+    <p><strong>Risk Rules:</strong></p>
+    <table>
+        <thead>
+            <tr><th>Condition</th><th>Risk Level</th><th>Category</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>Rated power &gt; 20kW</td><td><span class="badge badge-orange">Medium</span></td><td>Power / Electrical</td></tr>
+            <tr><td>RPM alerts &gt; 5 AND rated RPM &gt; 2500</td><td><span class="badge badge-red">High</span></td><td>RPM / Mechanical</td></tr>
+            <tr><td>Environment = high_humidity AND temp alerts &gt; 3</td><td><span class="badge badge-red">High</span></td><td>Environment</td></tr>
+            <tr><td>Environment = dusty</td><td><span class="badge badge-orange">Medium</span></td><td>Environment</td></tr>
+            <tr><td>Vibration alerts &gt; 5</td><td><span class="badge badge-orange">Medium</span></td><td>Vibration</td></tr>
+        </tbody>
+    </table>
+
+    <h4>Function 4: <code>generate_recommendations(db, machine_specs)</code></h4>
+    <div class="info-box blue">
+        <strong>Purpose:</strong> Orchestrate all analyses and produce the final comprehensive advisory output.
+    </div>
+    <p><strong>Outputs generated:</strong></p>
+    <ol>
+        <li><strong>Configuration Recommendations</strong> — Alert thresholds for temperature (factory warning), vibration (factory warning), and RPM (90% of rated capacity or factory warning, whichever is lower)</li>
+        <li><strong>Preventive Guidelines</strong> — Standard commissioning checklist items plus pattern-specific critical warnings for recurring failure types</li>
+        <li><strong>Aggregated Summary</strong> — Total patterns found, risk counts by level, and data confidence rating</li>
+    </ol>
+
+    <!-- =================== 6. FRONTEND =================== -->
+    <div class="page-break"></div>
+
+    <h2 id="frontend"><span class="section-number">6</span>Frontend Implementation</h2>
+
+    <h3>6.1 Component: CommissioningPanel</h3>
+    <p>
+        The <code>CommissioningPanel</code> is a full-screen React component rendered as an overlay when the user clicks the <strong>"🏭 NEW"</strong> button in the main navigation bar. It provides a responsive, two-section layout:
+    </p>
+
+    <div class="grid-2">
+        <div class="card">
+            <h4>📝 Input Section (Left Column)</h4>
+            <table>
+                <tr><td><strong>Machine Type</strong></td><td>Text input (required)</td></tr>
+                <tr><td><strong>Rated Power</strong></td><td>Number input (kW)</td></tr>
+                <tr><td><strong>Rated RPM</strong></td><td>Number input</td></tr>
+                <tr><td><strong>Max Temp</strong></td><td>Number input (°C)</td></tr>
+                <tr><td><strong>Environment</strong></td><td>Dropdown select</td></tr>
+            </table>
+        </div>
+        <div class="card">
+            <h4>📊 Results Section (Right 2 Columns)</h4>
+            <ol>
+                <li>Analysis Summary (4 metric cards)</li>
+                <li>Operational Risks (color-coded cards)</li>
+                <li>Safe Operating Limits (3-parameter grid)</li>
+                <li>Configuration Recommendations</li>
+                <li>Historical Failure Patterns</li>
+            </ol>
+        </div>
+    </div>
+
+    <h3>6.2 State Management</h3>
+    <pre><code>const [specs, setSpecs] = useState({
+    machine_type: "",
+    rated_power: 10,
+    rated_rpm: 2000,
+    rated_temperature: 60,
+    environment: "normal"
+});
+const [analysis, setAnalysis] = useState(null);    // API response
+const [loading, setLoading] = useState(false);     // Loading state
+const [error, setError] = useState(null);          // Error message</code></pre>
+
+    <h3>6.3 API Integration</h3>
+    <pre><code>const handleAnalyze = async () => {
+    setLoading(true);
+    const res = await fetch(`${API_BASE}/commissioning/analyze`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(specs)
+    });
+    const data = await res.json();
+    setAnalysis(data);
+    setLoading(false);
+};</code></pre>
+
+    <h3>6.4 Navigation Integration in App.jsx</h3>
+    <p>The panel is integrated into the main application shell through state management and conditional rendering:</p>
+    <pre><code>// State declaration (line 800)
+const [showCommissioning, setShowCommissioning] = useState(false);
+
+// Navigation button (line 972)
+&lt;button onClick={() => setShowCommissioning(true)}&gt;🏭 NEW&lt;/button&gt;
+
+// Full-screen overlay render (lines 1207-1212)
+{showCommissioning && (
+    &lt;div style={{ position: 'fixed', inset: 0, zIndex: 100 }}&gt;
+        &lt;CommissioningPanel onBack={() => setShowCommissioning(false)} /&gt;
+    &lt;/div&gt;
+)}</code></pre>
+
+    <!-- =================== 7. DATA FLOW =================== -->
+    <div class="page-break"></div>
+
+    <h2 id="data-flow"><span class="section-number">7</span>Data Flow & Sequence</h2>
+
+    <table>
+        <thead>
+            <tr><th>Step</th><th>Actor</th><th>Action</th><th>Data</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>1</td><td>User</td><td>Enters machine specifications in the form</td><td>machine_type, rated_power, rated_rpm, rated_temperature, environment</td></tr>
+            <tr><td>2</td><td>User</td><td>Clicks "Analyze Factory History"</td><td>—</td></tr>
+            <tr><td>3</td><td>Frontend</td><td>Sends POST request to <code>/commissioning/analyze</code></td><td>JSON body with specs</td></tr>
+            <tr><td>4</td><td>API Router</td><td>Validates input via Pydantic model</td><td>NewMachineSpecs</td></tr>
+            <tr><td>5</td><td>Service</td><td>Queries Alert table (past 30 days)</td><td>SQL query → alert list</td></tr>
+            <tr><td>6</td><td>Service</td><td>Groups and analyzes alert patterns</td><td>Pattern frequency map</td></tr>
+            <tr><td>7</td><td>Service</td><td>Queries MachineReading table (health &gt; 60)</td><td>SQL query → reading list</td></tr>
+            <tr><td>8</td><td>Service</td><td>Computes statistical safe limits (μ ± kσ)</td><td>Temperature, vibration, RPM thresholds</td></tr>
+            <tr><td>9</td><td>Service</td><td>Evaluates risk rules against specs + history</td><td>Risk assessments with mitigations</td></tr>
+            <tr><td>10</td><td>Service</td><td>Generates configuration recommendations</td><td>Monitoring threshold suggestions</td></tr>
+            <tr><td>11</td><td>Service</td><td>Compiles preventive guidelines</td><td>Checklist items + critical warnings</td></tr>
+            <tr><td>12</td><td>API Router</td><td>Returns CommissioningResponse</td><td>Full JSON response</td></tr>
+            <tr><td>13</td><td>Frontend</td><td>Renders 5 result sections</td><td>Analysis dashboard</td></tr>
+        </tbody>
+    </table>
+
+    <!-- =================== 8. TESTING =================== -->
+    <h2 id="testing"><span class="section-number">8</span>Testing & Results</h2>
+
+    <h3>8.1 API Endpoint Test</h3>
+
+    <h4>Test Request</h4>
+    <pre><code>POST http://127.0.0.1:8000/commissioning/analyze
+Content-Type: application/json
+
+{
+    "machine_type": "CNC Lathe",
+    "rated_power": 15,
+    "rated_rpm": 3000,
+    "rated_temperature": 70,
+    "environment": "high_humidity"
+}</code></pre>
+
+    <h4>Test Result</h4>
+    <div class="info-box green">
+        <strong>✅ Status:</strong> 200 OK — <code>success: true</code><br>
+        The API returned a complete analysis including failure patterns, safe operating limits, operational risks, configuration recommendations, and preventive guidelines.
+    </div>
+
+    <h3>8.2 Verification Checklist</h3>
+    <table>
+        <thead>
+            <tr><th>Test Case</th><th>Expected</th><th>Result</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>API returns correct structure</td>
+                <td>All 7 response fields present</td>
+                <td><span class="badge badge-green">PASS</span></td>
+            </tr>
+            <tr>
+                <td>Failure patterns sorted by frequency</td>
+                <td>Descending order by occurrences</td>
+                <td><span class="badge badge-green">PASS</span></td>
+            </tr>
+            <tr>
+                <td>Safe limits have all 3 parameters</td>
+                <td>temperature, vibration, rpm present</td>
+                <td><span class="badge badge-green">PASS</span></td>
+            </tr>
+            <tr>
+                <td>High RPM + RPM alerts → high risk</td>
+                <td>Risk flagged with mitigation</td>
+                <td><span class="badge badge-green">PASS</span></td>
+            </tr>
+            <tr>
+                <td>Humidity + temp alerts → high risk</td>
+                <td>Condensation risk flagged</td>
+                <td><span class="badge badge-green">PASS</span></td>
+            </tr>
+            <tr>
+                <td>Router registered in main.py</td>
+                <td>Commissioning router included</td>
+                <td><span class="badge badge-green">PASS</span></td>
+            </tr>
+            <tr>
+                <td>Navigation button in header</td>
+                <td>"🏭 NEW" button visible</td>
+                <td><span class="badge badge-green">PASS</span></td>
+            </tr>
+            <tr>
+                <td>Panel overlay rendering</td>
+                <td>Full-screen overlay on click</td>
+                <td><span class="badge badge-green">PASS</span></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- =================== 9. DESIGN DECISIONS =================== -->
+    <div class="page-break"></div>
+
+    <h2 id="design-decisions"><span class="section-number">9</span>Key Design Decisions</h2>
+
+    <table>
+        <thead>
+            <tr><th>Decision</th><th>Rationale</th></tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Use μ ± kσ for threshold calculation</td>
+                <td>Statistical approach adapts to the factory's own data distribution rather than using arbitrary hard-coded values. Different k-values per parameter account for different risk tolerances.</td>
+            </tr>
+            <tr>
+                <td>Filter readings where health_score &gt; 60</td>
+                <td>Ensures thresholds are learned only from "healthy" operating conditions, preventing degraded machine data from skewing the analysis.</td>
+            </tr>
+            <tr>
+                <td>Default fallback values when data &lt; 10 readings</td>
+                <td>Provides sensible industry-standard defaults when insufficient historical data exists, preventing system failure on fresh installations.</td>
+            </tr>
+            <tr>
+                <td>Cap failure patterns at top 10</td>
+                <td>Focuses operator attention on the most impactful patterns rather than overwhelming with noise from rare events.</td>
+            </tr>
+            <tr>
+                <td>90% RPM safety margin recommendation</td>
+                <td>Standard engineering practice — operating at 10% below rated capacity reduces mechanical stress and extends machine lifespan.</td>
+            </tr>
+            <tr>
+                <td>Environment-aware risk cross-referencing</td>
+                <td>Combines the new machine's deployment environment with historical incident data to uncover compound risks (e.g., humidity + temperature alerts → condensation).</td>
+            </tr>
+            <tr>
+                <td>Full-screen overlay rendering</td>
+                <td>Provides dedicated workspace for commissioning analysis without disrupting the main dashboard context.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- =================== 10. UI =================== -->
+    <h2 id="screenshots"><span class="section-number">10</span>User Interface</h2>
+
+    <h3>10.1 Input Form</h3>
+    <p>The left column presents a clean, focused input form with 5 fields for machine specifications. The form includes input validation (machine type is required) and a gradient call-to-action button with loading state feedback.</p>
+
+    <h3>10.2 Results Dashboard</h3>
+    <p>Upon successful analysis, the right section displays 5 organized result cards:</p>
+    <ol>
+        <li><strong>Analysis Summary</strong> — Four metric cards showing patterns found, high/medium risk counts, and data confidence level</li>
+        <li><strong>Operational Risks</strong> — Color-coded risk cards (red border = high, yellow = medium, green = low) with category labels and mitigation recommendations</li>
+        <li><strong>Safe Operating Limits</strong> — Three-column grid showing optimal/warning/critical thresholds for temperature, vibration, and RPM with appropriate icons</li>
+        <li><strong>Configuration Recommendations</strong> — Parameter cards showing recommended values with units and reasoning</li>
+        <li><strong>Historical Failure Patterns</strong> — Top 5 recurring issues with type, occurrence count, root cause, and prevention strategy</li>
+    </ol>
+
+    <h3>10.3 Design Language</h3>
+    <p>The UI follows the JARVIS HUD design system — dark theme (<code>#0a0e17</code> background), cyan/purple gradient accents, glassmorphism effects (<code>backdrop-blur</code>), and color-coded severity indicators consistent with the rest of the application.</p>
+
+    <!-- =================== 11. CONCLUSION =================== -->
+    <div class="page-break"></div>
+
+    <h2 id="conclusion"><span class="section-number">11</span>Conclusion & Future Scope</h2>
+
+    <h3>11.1 Conclusion</h3>
+    <p>
+        The New Machine Commissioning Advisor has been successfully implemented as a full-stack feature within the JARVIS Smart Factory Monitoring System. The system demonstrates the practical application of historical data analysis for proactive factory management — transforming past operational records into actionable intelligence for future machine deployments.
+    </p>
+    <p>
+        Key achievements:
+    </p>
+    <ul>
+        <li>Statistical analysis pipeline that adapts thresholds to the factory's own operational profile</li>
+        <li>Multi-factor risk assessment combining machine specifications with historical incident data</li>
+        <li>Clean, intuitive UI integrated seamlessly into the existing JARVIS dashboard</li>
+        <li>RESTful API design supporting both integrated panel use and standalone API access</li>
+    </ul>
+
+    <h3>11.2 Future Enhancements</h3>
+    <table>
+        <thead>
+            <tr><th>Enhancement</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+            <tr><td>LLM-Powered Analysis</td><td>Integrate Gemini/Ollama to generate natural language recommendations and root cause summaries</td></tr>
+            <tr><td>Machine Learning Models</td><td>Train regression models on historical data for more precise threshold prediction</td></tr>
+            <tr><td>PDF Report Export</td><td>Allow operators to download commissioning analysis as a formatted PDF report</td></tr>
+            <tr><td>Commissioning Checklist</td><td>Interactive step-by-step checklist that tracks commissioning progress</td></tr>
+            <tr><td>Similar Machine Comparison</td><td>Compare specs with existing machines to find the closest match and its performance history</td></tr>
+            <tr><td>Multi-Factory Support</td><td>Cross-factory analysis to leverage data from multiple manufacturing sites</td></tr>
+        </tbody>
+    </table>
+
+    <hr>
+
+    <div style="text-align: center; padding: 30px 0; color: var(--text-secondary); font-size: 13px;">
+        <p><strong>JARVIS — Smart Factory Monitoring System v2.0.0</strong></p>
+        <p>New Machine Commissioning Advisor — Implementation Report</p>
+        <p>© 2026 Rithish. All rights reserved.</p>
+    </div>
+</div>
+
+</body>
+</html>
