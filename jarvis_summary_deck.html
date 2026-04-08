@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <title>JARVIS - Smart Factory Monitoring System | Final Summary</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/black.min.css" id="theme">
+
+    <!-- Theme used for syntax highlighted code -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/monokai.min.css">
+
+    <style>
+        .reveal .slide-background {
+            background: radial-gradient(circle at center, #1a1a2e 0%, #0f0f1a 100%);
+        }
+        .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+            color: #00f0ff;
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .reveal p, .reveal li {
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+        }
+        .highlight-text {
+            color: #ff0055;
+            font-weight: bold;
+            text-shadow: 0 0 8px rgba(255, 0, 85, 0.4);
+        }
+        .accent-box {
+            background: rgba(0, 240, 255, 0.1);
+            border: 1px solid #00f0ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .tech-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            margin: 5px;
+            border-radius: 20px;
+            background: linear-gradient(45deg, #00f0ff, #0055ff);
+            color: white;
+            font-size: 0.6em;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="reveal">
+        <div class="slides">
+            <!-- Slide 1: Title -->
+            <section>
+                <img src="https://img.icons8.com/color/150/000000/artificial-intelligence.png" alt="AI Icon" style="background:transparent; border:none; box-shadow:none; margin-bottom: 0;">
+                <h1 style="font-size: 2.5em; margin-bottom: 0;">JARVIS</h1>
+                <h3 style="color: #fff; font-size: 1.2em; text-transform: none; letter-spacing: 1px;">Smart Factory Monitoring System</h3>
+                <p style="font-size: 0.8em; margin-top: 40px; color: #888;">AI-Powered Industrial IoT Platform for Smart Manufacturing</p>
+                <p style="font-size: 0.6em; color: #555;">v2.0.0 | Built by Rithish</p>
+            </section>
+
+            <!-- Slide 2: The Vision -->
+            <section>
+                <h2>The Vision</h2>
+                <div class="accent-box">
+                    <p style="font-size: 0.9em; text-align: left;">
+                        Transforming traditional manufacturing floors into <span class="highlight-text">intelligent, self-monitoring</span> environments.
+                    </p>
+                </div>
+                <ul style="font-size: 0.8em;">
+                    <li>Beyond simple dashboards — a truly conversational AI assistant</li>
+                    <li>Predict failures before they cause downtime</li>
+                    <li>Empower operators with an Iron Man-inspired futuristic HUD</li>
+                </ul>
+            </section>
+
+            <!-- Slide 3: Core Capabilities -->
+            <section>
+                <h2>Core Capabilities</h2>
+                <div class="grid-container" style="font-size: 0.7em;">
+                    <div class="accent-box">
+                        <h4 style="font-size: 1.2em; color: #fff;">🖥️ Real-Time Monitoring</h4>
+                        <p>Live WebSocket tracking of machine health, temperature, vibration, and RPM.</p>
+                    </div>
+                    <div class="accent-box">
+                        <h4 style="font-size: 1.2em; color: #fff;">🔮 Predictive Maintenance</h4>
+                        <p>AI predicts failures based on sensor trends to schedule maintenance proactively.</p>
+                    </div>
+                    <div class="accent-box">
+                        <h4 style="font-size: 1.2em; color: #fff;">🤖 JARVIS AI Assistant</h4>
+                        <p>Multi-lingual conversational AI (English, Tamil, Tanglish) with Voice Commands.</p>
+                    </div>
+                    <div class="accent-box">
+                        <h4 style="font-size: 1.2em; color: #fff;">🏭 Commissioning Advisor</h4>
+                        <p>Data-driven recommendations for setting safe limits on new machines.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Slide 4: Data Science & Algorithms -->
+            <section>
+                <h2>Intelligence Layer</h2>
+                <ul style="font-size: 0.75em; line-height: 1.6;">
+                    <li><span class="highlight-text">Statistical Anomalies (Z-Score):</span> Monitors real-time streams against historical baselines.</li>
+                    <li><span class="highlight-text">Threshold Detection (μ ± kσ):</span> Computes precise safe operating boundaries based on empirical data.</li>
+                    <li><span class="highlight-text">Weighted Health Scoring:</span> Multi-variable fusion (Temp + Vibration + RPM) into a unified 0-100% index.</li>
+                    <li><span class="highlight-text">LLM NLP (Ollama/Mistral):</span> Context-aware intent parsing and response generation locally.</li>
+                </ul>
+            </section>
+
+            <!-- Slide 5: Tech Stack -->
+            <section>
+                <h2>Technology Stack</h2>
+                <div style="margin-top: 30px;">
+                    <p style="font-size: 0.8em; color: #aaa; margin-bottom: 10px;">Backend</p>
+                    <span class="tech-badge">Python 3.10+</span>
+                    <span class="tech-badge">FastAPI</span>
+                    <span class="tech-badge">WebSockets</span>
+                    <span class="tech-badge">SQLAlchemy</span>
+                    
+                    <p style="font-size: 0.8em; color: #aaa; margin-top: 20px; margin-bottom: 10px;">Frontend</p>
+                    <span class="tech-badge">React 19</span>
+                    <span class="tech-badge">Vite</span>
+                    <span class="tech-badge">TailwindCSS</span>
+                    <span class="tech-badge">Web Speech API</span>
+
+                    <p style="font-size: 0.8em; color: #aaa; margin-top: 20px; margin-bottom: 10px;">AI & Data</p>
+                    <span class="tech-badge">Ollama (Mistral)</span>
+                    <span class="tech-badge">SQLite</span>
+                    <span class="tech-badge">Recharts</span>
+                </div>
+            </section>
+
+            <!-- Slide 6: Future Roadmap -->
+            <section>
+                <h2>Future Roadmap</h2>
+                <div class="accent-box" style="font-size: 0.8em; text-align: left;">
+                    <ul>
+                        <li style="margin-bottom: 10px;">🌐 <strong>Google Gemini Integration:</strong> Cloud-scale reasoning capabilities</li>
+                        <li style="margin-bottom: 10px;">🔍 <strong>Root Cause Analysis Agent:</strong> Automated deep-dives into failures</li>
+                        <li style="margin-bottom: 10px;">📚 <strong>RAG with Equipment Manuals:</strong> Instant access to manufacturer specs</li>
+                        <li style="margin-bottom: 10px;">📱 <strong>Mobile App (React Native):</strong> Factory control from anywhere</li>
+                        <li>🏢 <strong>Multi-factory Support:</strong> Enterprise-wide visibility</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Slide 7: Conclusion -->
+            <section>
+                <h2 style="font-size: 2em;">Ready for Deployment</h2>
+                <p style="font-size: 0.9em; margin-top: 30px;">
+                    <em>"Built with ❤️ for the future of smart manufacturing"</em>
+                </p>
+                <div style="margin-top: 50px;">
+                    <a href="http://localhost:5173" target="_blank" style="padding: 15px 30px; background: #00f0ff; color: #000; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 0.8em; transition: 0.3s; box-shadow: 0 0 15px rgba(0,240,255,0.5);">Launch Dashboard</a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/notes/notes.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/markdown/markdown.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/plugin/highlight/highlight.min.js"></script>
+    <script>
+        Reveal.initialize({
+            hash: true,
+            transition: 'slide',
+            backgroundTransition: 'fade',
+            plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ]
+        });
+    </script>
+</body>
+</html>
